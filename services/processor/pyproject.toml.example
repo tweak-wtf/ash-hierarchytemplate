@@ -1,0 +1,37 @@
+[tool.poetry]
+name = "ash-hierarchytemplates"
+version = "0.1.0-dev"
+description = "Hierarchy Templates for AYON projects"
+authors = ["doerp <me@doerp.cool>"]
+
+[tool.poetry.dependencies]
+appdirs = "^1.4"
+python = ">=3.9,<4.0"
+pydantic = "^1.10.2"
+nxtools = "^1.6"
+ayon-python-api = "1.0.0rc3"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.dockerize]
+python_version = ">=3.9,<4.0"
+name = "doerp/ash-hierarchytemplate-processor"
+tags = ["0.1.0-dev"]
+entrypoint = ["python", "-m", "processor"]
+labels = {"MY_APP_LABEL" = "dev"}
+
+[tool.dockerize.env]
+AYON_ADDON_NAME = "HierarchyTemplate"
+AYON_ADDON_VERSION = "0.1.0-dev"
+AYON_SERVER_URL = "https://my-awesome-ayon-instance" 
+AYON_API_KEY = "AYON_SERVICE_USER_KEY"
+
+
+
+
+
