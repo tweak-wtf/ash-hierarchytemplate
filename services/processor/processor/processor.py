@@ -57,26 +57,26 @@ class HierarchyTemplateProcessor:
             try:
                 self.settings = ayon_api.get_service_addon_settings()
                 logging.info(f"Processing Event: {target_event['id']}")
-                ensure_hierarchy_template_attrib()
 
                 # query source event and its project
                 source_event = ayon_api.get_event(target_event["dependsOn"])
                 project = ayon_api.get_project(source_event["project"])
 
-                if not project["attrib"].get("ashHierarchyTemplate"):
-                    raise HierarchyTemplateAttributreNotPresent(
-                        "Please set 'ashHierarchyTemplate' Attribute on this project."
-                    )
-
                 # update target event with project name and hierarchy template
                 ayon_api.update_event(
                     target_event["id"],
                     project_name=project["name"],
-                    # ? payload doesn't get updated in Ayon
-                    payload={
-                        "hierarchy_template": project["attrib"]["ashHierarchyTemplate"]
-                    },
+                    # # ? payload doesn't get updated in Ayon
+                    # payload={
+                    #     "hierarchy_template": project["attrib"]["ashHierarchyTemplate"]
+                    # },
                 )
+
+                ensure_hierarchy_template_attrib()
+                if not project["attrib"].get("ashHierarchyTemplate"):
+                    raise HierarchyTemplateAttributreNotPresent(
+                        "Please set 'ashHierarchyTemplate' Attribute on this project."
+                    )
 
                 # process target event
                 HierarchyTemplateHandler.process_event(project, self.settings)
