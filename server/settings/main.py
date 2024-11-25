@@ -77,7 +77,7 @@ class HierarchyTemplateAddonSettings(BaseSettingsModel):
     """Hierarchy Template Addon Settings."""
 
     service_secret: str = Field(
-        description="Service User Secret to use for authentification.",
+        "hierarchytemplate_service",
         title="Service Secret",
         enum_resolver=secrets_enum,
     )
@@ -89,6 +89,7 @@ class HierarchyTemplateAddonSettings(BaseSettingsModel):
 
 
 DEFAULT_VALUES = {
+    "service_secret": "hierarchytemplate_service",
     "hierarchy_template": [
         {
             "name": "basic",
