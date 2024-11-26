@@ -3,7 +3,7 @@ title = "HierarchyTemplate"
 version = "0.2.0-dev"
 
 services = {
-    "processor": {"image": f"doerp/ash-hierarchytemplate-processor:{version}"},
+    "HierarchyTemplateProcessor": {"image": f"doerp/ash-hierarchytemplate-processor:{version}"},
 }
 client_dir = "ash_hierarchytemplate"
 
