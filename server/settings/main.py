@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from pydantic import Field
 from ayon_server.settings import BaseSettingsModel
-from ayon_server.settings.enum import task_types_enum, folder_types_enum, secrets_enum
+from ayon_server.settings.enum import task_types_enum, folder_types_enum
 
 
 class Task(BaseSettingsModel):
@@ -76,11 +76,6 @@ class HierarchyTemplateSettings(BaseSettingsModel):
 class HierarchyTemplateAddonSettings(BaseSettingsModel):
     """Hierarchy Template Addon Settings."""
 
-    service_secret: str = Field(
-        "hierarchytemplate_service",
-        title="Service Secret",
-        enum_resolver=secrets_enum,
-    )
     hierarchy_template: List[HierarchyTemplateSettings] = Field(
         default_factory=list,
         description="List of Hierarchy Template Settings.",
@@ -89,7 +84,6 @@ class HierarchyTemplateAddonSettings(BaseSettingsModel):
 
 
 DEFAULT_VALUES = {
-    "service_secret": "hierarchytemplate_service",
     "hierarchy_template": [
         {
             "name": "basic",
