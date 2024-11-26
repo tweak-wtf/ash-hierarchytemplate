@@ -6,3 +6,6 @@ IMAGE := doerp/$(BASE_NAME):$(AYON_ADDON_VERSION)
 
 build:
 	docker build -t $(IMAGE) -f Dockerfile .
+
+push:
+	docker push $(IMAGE)
