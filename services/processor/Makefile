@@ -5,7 +5,7 @@ BASE_NAME := ash-$(AYON_ADDON_NAME)-$(SERVICE_NAME)
 IMAGE := doerp/$(BASE_NAME):$(AYON_ADDON_VERSION)
 
 build:
-	docker build -t $(IMAGE) -f Dockerfile .
+	docker build -t $(IMAGE) -f Dockerfile . --no-cache
 
 push:
 	docker push $(IMAGE)
