@@ -1,6 +1,10 @@
-# README
+# ash-hierarchytemplate
+AN AYON Addon for creating initial project folder hierarchies.
 
-- requires dockerize poetry plugin
-- need to manually create `ashHierarchyTemplate` attribute and set its value per project accounting to `ayon+settings://HierarchyTemplate/hierarchy_template`
-- create a named hierarchy template
-- set template key to be used in projects `ashHierarchyTemplate` attribute
+Depends on a running AYON service instance and the `ashHierarchyTemplate` project attribute.
+
+📝 The `ashHierarchyTemplate` attribute will be created on first caught `entity.project.created` event which requires a server reboot.
+
+## Settings
+
+📝 If new templates have been configured please ensure these are available as keys in the `ashHierarchyTemplate` attribute's `enum` property.
