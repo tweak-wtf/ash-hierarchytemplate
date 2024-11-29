@@ -451,8 +451,8 @@ def main(
     try:
         safe_copy_file(src_package_file, dst_package_file)
         copy_server_content(addon_output_dir, current_dir, log)
-        copy_frontend_content(addon_output_dir, current_dir, log)
-        zip_client_side(addon_output_dir, current_dir, log)
+        # copy_frontend_content(addon_output_dir, current_dir, log)
+        # zip_client_side(addon_output_dir, current_dir, log)
         failed = False
     finally:
         if failed and os.path.isdir(addon_output_dir):
