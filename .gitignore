@@ -1,6 +1,3 @@
-# prod files
-pyproject.toml
-
 # Addon package directory
 package/*
 

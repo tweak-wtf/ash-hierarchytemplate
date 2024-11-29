@@ -45,9 +45,8 @@ class HierarchyTemplate:
         if resp.status_code != 201:
             raise Exception(f"Failed to create item: {resp.content}")
 
-        if item["task_template"]["enabled"]:
-            for task in item["task_template"]["tasks"]:
-                self.apply_task(task, resp.data["id"])
+        for task in item["tasks"]:
+            self.apply_task(task, resp.data["id"])
 
         if item.get("children"):
             for child in item["children"]:

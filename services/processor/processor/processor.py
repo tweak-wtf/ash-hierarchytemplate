@@ -1,4 +1,4 @@
-from typing import List
+from typing import Dict, List
 
 import ayon_api
 from time import sleep
@@ -17,19 +17,50 @@ class HierarchyTemplateAttributreNotPresent(Exception):
     pass
 
 
-def ensure_hierarchy_template_attrib():
+def ensure_hierarchy_template_attrib(settings: Dict):
     """Ensure that the HierarchyTemplate attributes are present in the Ayon DB."""
-
     resp = ayon_api.get("attributes")
     if not resp.status_code == 200:
         raise Exception(f"Failed to get attributes: {resp.content}")
 
     attributes: List[str] = [attr["name"] for attr in resp.data.get("attributes")]
+    new_attrib_enum = [
+        {
+            "value": tmpl["name"],
+            "label": tmpl["name"].capitalize().replace("_", " "),
+        }
+        for tmpl in settings["hierarchy_template"]
+    ]
     if "ashHierarchyTemplate" not in attributes:
-        logging.info("Creating HierarchyTemplate Attribute...")
-        raise HierarchyTemplateAttributreNotPresent(
-            "Please manually create 'ashHierarchyTemplate' Attribute in Ayon."
+        new_attrib_position = len(attributes) + 1
+        new_attrib_data = {
+            "type": "string",
+            "title": "Hierarchy Template",
+            "description": "Hierarchy Template Name",
+            "default": "",  # enable maybe?
+            "enum": new_attrib_enum,
+        }
+        ayon_api.set_attribute_config(
+            attribute_name="ashHierarchyTemplate",
+            data=new_attrib_data,
+            position=new_attrib_position,
+            scope=["project"],
         )
+    else:  # check if all templates are present
+        attrib_enum = [
+            attr
+            for attr in resp.data.get("attributes")
+            if attr["name"] == "ashHierarchyTemplate"
+        ][0]["data"]["enum"]
+        attrib_enum_names = {tmpl["value"] for tmpl in attrib_enum}
+        new_attrib_enum_names = {
+            tmpl["name"] for tmpl in settings["hierarchy_template"]
+        }
+        if not new_attrib_enum_names.issubset(attrib_enum_names):
+            missing_templates = new_attrib_enum_names - attrib_enum_names
+            raise HierarchyTemplateAttributreNotPresent(
+                f"Please add the following templates to 'ashHierarchyTemplate' Attribute: {missing_templates}"
+            )
 
 
 class HierarchyTemplateProcessor:
@@ -39,6 +70,8 @@ class HierarchyTemplateProcessor:
     def start_processing(self):
         """Main loop querying AYON events for new `entity.project.created` events"""
         logging.info("Start enrolling for Ayon `entity.project.created` Events...")
+        self.settings = ayon_api.get_service_addon_settings()
+        ensure_hierarchy_template_attrib(self.settings)
 
         while True:
             target_event = ayon_api.enroll_event_job(
@@ -62,17 +95,12 @@ class HierarchyTemplateProcessor:
                 source_event = ayon_api.get_event(target_event["dependsOn"])
                 project = ayon_api.get_project(source_event["project"])
 
-                # update target event with project name and hierarchy template
                 ayon_api.update_event(
                     target_event["id"],
                     project_name=project["name"],
-                    # # ? payload doesn't get updated in Ayon
-                    # payload={
-                    #     "hierarchy_template": project["attrib"]["ashHierarchyTemplate"]
-                    # },
                 )
 
-                ensure_hierarchy_template_attrib()
+                ensure_hierarchy_template_attrib(self.settings)
                 if not project["attrib"].get("ashHierarchyTemplate"):
                     raise HierarchyTemplateAttributreNotPresent(
                         "Please set 'ashHierarchyTemplate' Attribute on this project."

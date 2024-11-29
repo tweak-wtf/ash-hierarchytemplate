@@ -15,43 +15,22 @@ class Task(BaseSettingsModel):
     )
 
 
-class TaskTemplate(BaseSettingsModel):
-    """Task Template Settings."""
-
-    # name: str = Field("Apply Tasks", description="Applies all Tasks to Parent Item.")
-    enabled: bool = Field(
-        False,
-        description="Whether the following Tasks shall be created or not.",
-        title="Enabled",
-    )
-    tasks: List[Task] = Field(
-        default_factory=list,
-        # description="List of Tasks.",
-        # title="Tasks",
-    )
-
-
 class HierarchyItem(BaseSettingsModel):
     """Hierarchy Item Settings."""
 
-    # _layout = "expanded"
+    _layout = "expanded"
 
     name: str = Field("folder", description="Name of the Hierarchy Item.")
-    enabled: bool = Field(
-        True,
-        description="Whether this Hierarchy Item is enabled.",
-        title="Enabled",
-    )
     type: str = Field(
         "Folder",
         enum_resolver=folder_types_enum,
         title="Item Type",
         scope=["studio"],
     )
-    task_template: Optional[TaskTemplate] = Field(
-        None,
-        description="Task Template to use for this item.",
-        title="Task Template",
+    tasks: List[Task] = Field(
+        default_factory=list,
+        description="List of Tasks.",
+        title="Tasks",
     )
     children: List["HierarchyItem"] = Field(
         default_factory=list,
@@ -86,57 +65,40 @@ class HierarchyTemplateAddonSettings(BaseSettingsModel):
 DEFAULT_VALUES = {
     "hierarchy_template": [
         {
-            "name": "basic",
+            "name": "default",
             "hierarchy": [
-                {
-                    "name": "sequences",
-                    "type": "Folder",
-                    "enabled": True,
-                    "children": [
-                        {
-                            "name": "main",
-                            "type": "Sequence",
-                            "enabled": True,
-                            "children": [],
-                            "task_template": {
-                                "tasks": [
-                                    {"name": "ingest", "type": "Edit"},
-                                    {"name": "daily", "type": "Edit"},
-                                ],
-                                "enabled": True,
-                            },
-                        }
-                    ],
-                    "task_template": {"tasks": [], "enabled": False},
-                },
                 {
                     "name": "assets",
                     "type": "Folder",
-                    "enabled": True,
+                    "tasks": [],
                     "children": [
                         {
-                            "name": "environment",
-                            "type": "Folder",
-                            "enabled": True,
+                            "name": "testAsset01",
+                            "type": "Asset",
+                            "tasks": [
+                                {"name": "modeling", "type": "Modeling"},
+                                {"name": "texture", "type": "Texture"},
+                                {"name": "rigging", "type": "Rigging"},
+                            ],
                             "children": [],
-                            "task_template": {"tasks": [], "enabled": False},
-                        },
-                        {
-                            "name": "character",
-                            "type": "Folder",
-                            "enabled": True,
-                            "children": [],
-                            "task_template": {"tasks": [], "enabled": False},
-                        },
-                        {
-                            "name": "prop",
-                            "type": "Folder",
-                            "enabled": True,
-                            "children": [],
-                            "task_template": {"tasks": [], "enabled": False},
-                        },
+                        }
                     ],
-                    "task_template": {"tasks": [], "enabled": False},
+                },
+                {
+                    "name": "shots",
+                    "type": "Folder",
+                    "tasks": [{"name": "edit", "type": "Edit"}],
+                    "children": [
+                        {
+                            "name": "testShot01",
+                            "type": "Folder",
+                            "tasks": [
+                                {"name": "compositing", "type": "Compositing"},
+                                {"name": "animation", "type": "Animation"},
+                            ],
+                            "children": [],
+                        }
+                    ],
                 },
             ],
         }
