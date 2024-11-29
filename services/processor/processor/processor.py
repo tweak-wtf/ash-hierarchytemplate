@@ -31,7 +31,6 @@ def ensure_hierarchy_template_attrib(settings: Dict):
         }
         for tmpl in settings["hierarchy_template"]
     ]
-    logging.info(f"{new_attrib_enum = }")
     if "ashHierarchyTemplate" not in attributes:
         new_attrib_position = len(attributes) + 1
         new_attrib_data = {
@@ -41,8 +40,6 @@ def ensure_hierarchy_template_attrib(settings: Dict):
             "default": "",  # enable maybe?
             "enum": new_attrib_enum,
         }
-        logging.info(f"{new_attrib_data = }")
-        logging.info(f"{new_attrib_position = }")
         ayon_api.set_attribute_config(
             attribute_name="ashHierarchyTemplate",
             data=new_attrib_data,
