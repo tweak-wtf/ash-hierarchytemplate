@@ -18,7 +18,7 @@ class Task(BaseSettingsModel):
 class HierarchyItem(BaseSettingsModel):
     """Hierarchy Item Settings."""
 
-    # _layout = "expanded"
+    _layout = "expanded"
 
     name: str = Field("folder", description="Name of the Hierarchy Item.")
     type: str = Field(
@@ -63,64 +63,44 @@ class HierarchyTemplateAddonSettings(BaseSettingsModel):
 
 
 DEFAULT_VALUES = {
-  "hierarchy_template": [
-    {
-      "name": "default",
-      "hierarchy": [
+    "hierarchy_template": [
         {
-          "name": "assets",
-          "type": "Folder",
-          "tasks": [],
-          "children": [
-            {
-              "name": "testAsset01",
-              "type": "Asset",
-              "tasks": [
+            "name": "default",
+            "hierarchy": [
                 {
-                  "name": "modeling",
-                  "type": "Modeling"
+                    "name": "assets",
+                    "type": "Folder",
+                    "tasks": [],
+                    "children": [
+                        {
+                            "name": "testAsset01",
+                            "type": "Asset",
+                            "tasks": [
+                                {"name": "modeling", "type": "Modeling"},
+                                {"name": "texture", "type": "Texture"},
+                                {"name": "rigging", "type": "Rigging"},
+                            ],
+                            "children": [],
+                        }
+                    ],
                 },
                 {
-                  "name": "texture",
-                  "type": "Texture"
+                    "name": "shots",
+                    "type": "Folder",
+                    "tasks": [{"name": "edit", "type": "Edit"}],
+                    "children": [
+                        {
+                            "name": "testShot01",
+                            "type": "Folder",
+                            "tasks": [
+                                {"name": "compositing", "type": "Compositing"},
+                                {"name": "animation", "type": "Animation"},
+                            ],
+                            "children": [],
+                        }
+                    ],
                 },
-                {
-                  "name": "rigging",
-                  "type": "Rigging"
-                }
-              ],
-              "children": []
-            }
-          ]
-        },
-        {
-          "name": "shots",
-          "type": "Folder",
-          "tasks": [
-            {
-              "name": "edit",
-              "type": "Edit"
-            }
-          ],
-          "children": [
-            {
-              "name": "testShot01",
-              "type": "Folder",
-              "tasks": [
-                {
-                  "name": "compositing",
-                  "type": "Compositing"
-                },
-                {
-                  "name": "animation",
-                  "type": "Animation"
-                }
-              ],
-              "children": []
-            }
-          ]
+            ],
         }
-      ]
-    }
-  ]
+    ]
 }
