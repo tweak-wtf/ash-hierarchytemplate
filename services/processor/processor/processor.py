@@ -121,7 +121,7 @@ class HierarchyTemplateProcessor:
                     status="failed",
                 )
             else:
-                success_msg = f"Successfully Created Hierarchy Template {project['attrib']['ashHierarchyTemplate']}"
+                success_msg = "Successfully applied Template"
                 logging.info(success_msg)
                 ayon_api.update_event(
                     target_event["id"],
