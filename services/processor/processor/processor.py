@@ -94,6 +94,11 @@ class HierarchyTemplateProcessor:
                 # query source event and its project
                 source_event = ayon_api.get_event(target_event["dependsOn"])
                 project = ayon_api.get_project(source_event["project"])
+                if not project:
+                    raise Exception(f"Project '{source_event['project']}' not found.")
+
+                if "aysvc" in source_event["sender"]:
+                    raise Exception("Event is from AYON Service, skipping...")
 
                 ayon_api.update_event(
                     target_event["id"],
