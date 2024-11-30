@@ -31,7 +31,24 @@ def ensure_hierarchy_template_attrib(settings: Dict):
         }
         for tmpl in settings["hierarchy_template"]
     ]
-    if "ashHierarchyTemplate" not in attributes:
+
+    # service attribute found
+    # check if all templates are present
+    if filter_match := filter(
+        lambda attr: attr["name"] == "ashHierarchyTemplate",
+        resp.data.get("attributes"),
+    ):
+        attrib_enum = next(filter_match)["data"]["enum"]
+        attrib_enum_names = {tmpl["value"] for tmpl in attrib_enum}
+        new_attrib_enum_names = {
+            tmpl["name"] for tmpl in settings["hierarchy_template"]
+        }
+        if not new_attrib_enum_names.issubset(attrib_enum_names):
+            missing_templates = new_attrib_enum_names - attrib_enum_names
+            raise HierarchyTemplateAttributreNotPresent(
+                f"Please add the following templates to 'ashHierarchyTemplate' Attribute: {missing_templates}"
+            )
+    else: # create the attribute
         new_attrib_position = len(attributes) + 1
         new_attrib_data = {
             "type": "string",
@@ -46,21 +63,6 @@ def ensure_hierarchy_template_attrib(settings: Dict):
             position=new_attrib_position,
             scope=["project"],
         )
-    else:  # check if all templates are present
-        attrib_enum = [
-            attr
-            for attr in resp.data.get("attributes")
-            if attr["name"] == "ashHierarchyTemplate"
-        ][0]["data"]["enum"]
-        attrib_enum_names = {tmpl["value"] for tmpl in attrib_enum}
-        new_attrib_enum_names = {
-            tmpl["name"] for tmpl in settings["hierarchy_template"]
-        }
-        if not new_attrib_enum_names.issubset(attrib_enum_names):
-            missing_templates = new_attrib_enum_names - attrib_enum_names
-            raise HierarchyTemplateAttributreNotPresent(
-                f"Please add the following templates to 'ashHierarchyTemplate' Attribute: {missing_templates}"
-            )
 
 
 class HierarchyTemplateProcessor:
@@ -129,7 +131,9 @@ class HierarchyTemplateProcessor:
                         )
                     HierarchyTemplateHandler.process_event(project, self.settings)
                 if target_event["topic"] == "taskTemplate.create":
-                    TaskTemplateHandler.process_event(source_event, self.settings, project)
+                    TaskTemplateHandler.process_event(
+                        source_event, self.settings, project
+                    )
             except Exception as err:
                 log_traceback(err)
                 ayon_api.update_event(
