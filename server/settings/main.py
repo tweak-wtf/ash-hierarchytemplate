@@ -91,7 +91,7 @@ DEFAULT_VALUES = {
                     "children": [
                         {
                             "name": "testShot01",
-                            "type": "Folder",
+                            "type": "Shot",
                             "tasks": [
                                 {"name": "compositing", "type": "Compositing"},
                                 {"name": "animation", "type": "Animation"},
