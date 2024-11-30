@@ -52,13 +52,44 @@ class HierarchyTemplateSettings(BaseSettingsModel):
     )
 
 
+class TaskTemplateSettings(BaseSettingsModel):
+    """Task Template Settings."""
+
+    name: str = Field("", description="Name of the Task Template Filter.")
+    folder_paths: List[str] = Field(
+        default_factory=list,
+        description="List of Folder Paths.",
+        title="Folder Paths",
+    )
+    folder_type: str = Field(
+        default_factory=list,
+        enum_resolver=folder_types_enum,
+        title="Folder Type",
+        scope=["studio"],
+    )
+    tasks: List[Task] = Field(
+        default_factory=list,
+        description="List of Tasks.",
+        title="Tasks",
+    )
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        self.name = self.folder_type.lower()
+
+
 class HierarchyTemplateAddonSettings(BaseSettingsModel):
     """Hierarchy Template Addon Settings."""
 
+    task_template: List[TaskTemplateSettings] = Field(
+        default_factory=list,
+        description="List of Task Templates.",
+        title="Task Templates",
+    )
     hierarchy_template: List[HierarchyTemplateSettings] = Field(
         default_factory=list,
-        description="List of Hierarchy Template Settings.",
-        title="Templates",
+        description="List of Project Hierarchy Templates.",
+        title="Hierarchy Templates",
     )
 
 
