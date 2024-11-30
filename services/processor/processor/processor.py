@@ -6,7 +6,7 @@ from os import environ as env
 from nxtools import logging, log_traceback
 from socket import gethostname as get_hostname
 
-from .handlers import HierarchyTemplateHandler
+from .handlers import HierarchyTemplateHandler, TaskTemplateHandler
 
 # set logging user to service name
 if service_name := env.get("AYON_SERVICE_NAME"):
@@ -68,20 +68,28 @@ class HierarchyTemplateProcessor:
         ayon_api.init_service()
 
     def start_processing(self):
-        """Main loop querying AYON events for new `entity.project.created` events"""
-        logging.info("Start enrolling for Ayon `entity.project.created` Events...")
+        """Main loop querying AYON events for new `entity.project.created` and `entity.folder.created` events"""
         self.settings = ayon_api.get_service_addon_settings()
         ensure_hierarchy_template_attrib(self.settings)
 
         while True:
-            target_event = ayon_api.enroll_event_job(
+            project_hierarchy_event = ayon_api.enroll_event_job(
                 source_topic="entity.project.created",
                 target_topic="hierarchyTemplate.create",
                 description="Create Hierarchy Template",
                 sender=get_hostname(),
-                max_retries=3,
+                max_retries=1,
                 sequential=False,
             )
+            folder_tasks_event = ayon_api.enroll_event_job(
+                source_topic="entity.folder.created",
+                target_topic="taskTemplate.create",
+                description="Create Hierarchy Template",
+                sender=get_hostname(),
+                max_retries=1,
+                sequential=False,
+            )
+            target_event = project_hierarchy_event or folder_tasks_event
 
             if not target_event:
                 sleep(5)
@@ -91,8 +99,11 @@ class HierarchyTemplateProcessor:
                 self.settings = ayon_api.get_service_addon_settings()
                 logging.info(f"Processing Event: {target_event['id']}")
 
-                # query source event and its project
+                # query target and source event and its project
+                target_event = ayon_api.get_event(target_event["id"])
                 source_event = ayon_api.get_event(target_event["dependsOn"])
+                logging.debug(f"{target_event = }")
+                logging.debug(f"{source_event = }")
                 project = ayon_api.get_project(source_event["project"])
                 if not project:
                     raise Exception(f"Project '{source_event['project']}' not found.")
@@ -106,13 +117,16 @@ class HierarchyTemplateProcessor:
                 )
 
                 ensure_hierarchy_template_attrib(self.settings)
-                if not project["attrib"].get("ashHierarchyTemplate"):
-                    raise HierarchyTemplateAttributreNotPresent(
-                        "Please set 'ashHierarchyTemplate' Attribute on this project."
-                    )
 
                 # process target event
-                HierarchyTemplateHandler.process_event(project, self.settings)
+                if target_event["topic"] == "hierarchyTemplate.create":
+                    if not project["attrib"].get("ashHierarchyTemplate"):
+                        raise HierarchyTemplateAttributreNotPresent(
+                            "Please set 'ashHierarchyTemplate' Attribute on this project."
+                        )
+                    HierarchyTemplateHandler.process_event(project, self.settings)
+                if target_event["topic"] == "taskTemplate.create":
+                    TaskTemplateHandler.process_event(source_event, self.settings)
             except Exception as err:
                 log_traceback(err)
                 ayon_api.update_event(
