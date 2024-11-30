@@ -1,5 +1,5 @@
 # ash-hierarchytemplate
-AN AYON Addon for creating initial project folder hierarchies.
+An AYON Addon for creating initial project folder hierarchies.
 
 Depends on a running AYON service instance and the `ashHierarchyTemplate` project attribute.
 
