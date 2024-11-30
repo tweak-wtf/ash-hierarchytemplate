@@ -108,6 +108,9 @@ class HierarchyTemplateProcessor:
                 if not project:
                     raise Exception(f"Project '{source_event['project']}' not found.")
 
+                if not source_event.get("sender"):
+                    raise Exception("Source Event has no sender, skipping...")
+
                 if "aysvc" in source_event["sender"]:
                     raise Exception("Event is from AYON Service, skipping...")
 
@@ -126,7 +129,7 @@ class HierarchyTemplateProcessor:
                         )
                     HierarchyTemplateHandler.process_event(project, self.settings)
                 if target_event["topic"] == "taskTemplate.create":
-                    TaskTemplateHandler.process_event(source_event, self.settings)
+                    TaskTemplateHandler.process_event(source_event, self.settings, project)
             except Exception as err:
                 log_traceback(err)
                 ayon_api.update_event(
