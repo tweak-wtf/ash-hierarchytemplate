@@ -7,6 +7,12 @@ Depends on a running AYON service instance and the `ashHierarchyTemplate` projec
 
 ## Settings
 
-> 📝 If new templates have been configured please ensure these are available as keys in the `ashHierarchyTemplate` attribute's `enum` property.
+> ⚠️ If new templates have been configured please ensure these are available as keys in the `ashHierarchyTemplate` attribute's `enum` property.
 
-![image](https://github.com/user-attachments/assets/386b82b1-960d-4bbb-89a7-8831b7cec29c)
+### Task Settings
+
+![image](https://github.com/user-attachments/assets/daf9d2f6-b7e3-4009-a481-2af14c2d61b0)
+
+### Hierarchy Settings
+
+![image](https://github.com/user-attachments/assets/bab49552-ea22-4990-8a8c-1ac2fc6e2b4e)
