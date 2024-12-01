@@ -14,11 +14,26 @@ class TaskTemplate:
     def apply(self, folder) -> None:
         for task in self.tasks:
             payload = {
-              "name": task["name"],
-              "taskType": task["type"],
-              "folderId": folder["id"],
+                "name": task["name"],
+                "taskType": task["type"],
+                "folderId": folder["id"],
             }
-            ayon_api.post(f"projects/{self.project['name']}/tasks", **payload)
+            task_resp = ayon_api.post(
+                f"projects/{self.project['name']}/tasks", **payload
+            )
+            if task_resp.status_code != 201:
+                logging.error(f"Failed to create task: {task_resp.data}")
+                continue
+
+            if task.get("assignees"):
+                payload = {
+                    "mode": "set",
+                    "users": task["assignees"],
+                }
+                ayon_api.post(
+                    f"projects/{self.project['name']}/tasks/{task_resp.data['id']}/assign",
+                    **payload,
+                )
 
 
 def process_event(event: dict, settings: dict, project: dict) -> None:
@@ -35,7 +50,9 @@ def process_event(event: dict, settings: dict, project: dict) -> None:
         settings["task_template"],
     ):
         if path_filter_hit := filter(
-            lambda tmpl: event_folder["path"] in tmpl["folder_paths"] if tmpl["folder_paths"] else True,
+            lambda tmpl: event_folder["path"] in tmpl["folder_paths"]
+            if tmpl["folder_paths"]
+            else True,
             template_filter_hit,
         ):
             task_template = TaskTemplate(

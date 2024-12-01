@@ -4,6 +4,14 @@ from pydantic import Field
 from ayon_server.settings import BaseSettingsModel
 from ayon_server.settings.enum import task_types_enum, folder_types_enum
 
+from ayon_server.lib.postgres import Postgres
+
+
+async def active_users_enum():
+    query = "SELECT * FROM users WHERE active = TRUE"
+    users = await Postgres.fetch(query)
+    return list([user["name"] for user in users])
+
 
 class Task(BaseSettingsModel):
     name: str = Field("Name", description="Name of the Task.")
@@ -12,6 +20,12 @@ class Task(BaseSettingsModel):
         enum_resolver=task_types_enum,
         title="Task Type",
         scope=["studio"],
+    )
+    assignees: List[str] = Field(
+        default_factory=list,
+        enum_resolver=active_users_enum,
+        description="List of Assignees.",
+        title="Assignees",
     )
 
 
