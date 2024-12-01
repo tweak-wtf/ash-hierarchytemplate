@@ -22,7 +22,7 @@ class Task(BaseSettingsModel):
         scope=["studio"],
     )
     assignees: List[str] = Field(
-        default="",
+        default_factory=list,
         enum_resolver=active_users_enum,
         description="List of Assignees.",
         title="Assignees",
