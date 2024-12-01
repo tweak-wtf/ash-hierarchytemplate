@@ -4,6 +4,14 @@ from pydantic import Field
 from ayon_server.settings import BaseSettingsModel
 from ayon_server.settings.enum import task_types_enum, folder_types_enum
 
+from ayon_server.lib.postgres import Postgres
+
+
+async def active_users_enum():
+    query = "SELECT * FROM users WHERE active = TRUE"
+    users = await Postgres.fetch(query)
+    return list([user["name"] for user in users])
+
 
 class Task(BaseSettingsModel):
     name: str = Field("Name", description="Name of the Task.")
@@ -12,6 +20,12 @@ class Task(BaseSettingsModel):
         enum_resolver=task_types_enum,
         title="Task Type",
         scope=["studio"],
+    )
+    assignees: List[str] = Field(
+        default_factory=list,
+        enum_resolver=active_users_enum,
+        description="List of Assignees.",
+        title="Assignees",
     )
 
 
@@ -52,13 +66,44 @@ class HierarchyTemplateSettings(BaseSettingsModel):
     )
 
 
+class TaskTemplateSettings(BaseSettingsModel):
+    """Task Template Settings."""
+
+    name: str = Field("", description="Name of the Task Template Filter.")
+    folder_paths: List[str] = Field(
+        default_factory=list,
+        description="List of Folder Paths.",
+        title="Folder Paths",
+    )
+    folder_type: str = Field(
+        default_factory=list,
+        enum_resolver=folder_types_enum,
+        title="Folder Type",
+        scope=["studio"],
+    )
+    tasks: List[Task] = Field(
+        default_factory=list,
+        description="List of Tasks.",
+        title="Tasks",
+    )
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        self.name = self.folder_type.lower()
+
+
 class HierarchyTemplateAddonSettings(BaseSettingsModel):
     """Hierarchy Template Addon Settings."""
 
+    task_template: List[TaskTemplateSettings] = Field(
+        default_factory=list,
+        description="List of Task Templates.",
+        title="Task Templates",
+    )
     hierarchy_template: List[HierarchyTemplateSettings] = Field(
         default_factory=list,
-        description="List of Hierarchy Template Settings.",
-        title="Templates",
+        description="List of Project Hierarchy Templates.",
+        title="Hierarchy Templates",
     )
 
 
