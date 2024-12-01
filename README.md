@@ -3,6 +3,7 @@ An AYON Addon for creating initial project folder hierarchies and task templates
 
 Depends on a running AYON service instance and the `ashHierarchyTemplate` project attribute.
 The service handles all interaction with entities. It acts if new projects or folders are created.
+Tagged Docker images are available on [DockerHub](https://hub.docker.com/r/doerp/ash-hierarchytemplate-processor) and will be pulled when starting the service.
 
 > 📝 The `ashHierarchyTemplate` attribute will be created on first caught `entity.project.created` event which requires a server reboot.
 
