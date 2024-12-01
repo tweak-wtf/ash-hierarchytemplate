@@ -35,7 +35,9 @@ def process_event(event: dict, settings: dict, project: dict) -> None:
         settings["task_template"],
     ):
         if path_filter_hit := filter(
-            lambda tmpl: event_folder["path"] in tmpl["folder_paths"] if tmpl["folder_paths"] else True,
+            lambda tmpl: event_folder["path"] in tmpl["folder_paths"]
+            if tmpl["folder_paths"]
+            else True,
             template_filter_hit,
         ):
             task_template = TaskTemplate(
