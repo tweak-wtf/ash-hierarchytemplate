@@ -24,9 +24,19 @@ class HierarchyTemplate:
             "taskType": task["type"],
             "folderId": parent_id,
         }
-        resp = ayon_api.post(f"projects/{self.project['name']}/tasks", **payload)
-        if not resp.status_code == 201:
-            raise Exception(f"Failed to create task: {resp.content}")
+        task_resp = ayon_api.post(f"projects/{self.project['name']}/tasks", **payload)
+        if not task_resp.status_code == 201:
+            raise Exception(f"Failed to create task: {task_resp.content}")
+
+        if task.get("assignees"):
+            payload = {
+                "mode": "set",
+                "users": task["assignees"],
+            }
+            ayon_api.post(
+                f"projects/{self.project['name']}/tasks/{task_resp.data['id']}/assign",
+                **payload,
+            )
 
     def create_hierarchy_item(self, item: dict, parent: str = None):
         logging.debug(f"processing {item['name']}:{item['type']}")
