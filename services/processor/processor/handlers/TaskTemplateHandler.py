@@ -13,15 +13,16 @@ class TaskTemplate:
 
     def apply(self, folder) -> None:
         for task in self.tasks:
-            new_task = ayon_api.create_task(
-                project_name=self.project["name"],
-                name=task["name"],
-                task_type=task["type"],
-                folder_id=folder["id"]
+            payload = {
+                "name": task["name"],
+                "taskType": task["type"],
+                "folderId": folder["id"],
+            }
+            task_resp = ayon_api.post(
+                f"projects/{self.project['name']}/tasks", **payload
             )
-
-            if not new_task:
-                logging.error(f"Failed to create task: {new_task.data}")
+            if task_resp.status_code != 201:
+                logging.error(f"Failed to create task: {task_resp.data}")
                 continue
 
             if task.get("assignees"):
