@@ -15,6 +15,7 @@ class TaskTemplate:
         for task in self.tasks:
             payload = {
                 "name": task["name"],
+                "label": task["name"],
                 "taskType": task["type"],
                 "folderId": folder["id"],
             }
