@@ -21,6 +21,7 @@ class HierarchyTemplate:
         logging.info(f"applying task: {task}")
         payload = {
             "name": task["name"],
+            "label": task["name"],
             "taskType": task["type"],
             "folderId": parent_id,
         }
