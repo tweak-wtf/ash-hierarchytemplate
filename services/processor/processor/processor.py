@@ -17,6 +17,10 @@ class HierarchyTemplateAttributreNotPresent(Exception):
     pass
 
 
+class KnownException(Exception):
+    pass
+
+
 def ensure_hierarchy_template_attrib(settings: Dict):
     """Ensure that the HierarchyTemplate attributes are present in the Ayon DB."""
     resp = ayon_api.get("attributes")
@@ -108,13 +112,15 @@ class HierarchyTemplateProcessor:
                 logging.debug(f"{source_event = }")
                 project = ayon_api.get_project(source_event["project"])
                 if not project:
-                    raise Exception(f"Project '{source_event['project']}' not found.")
+                    errmsg = f"Project '{source_event['project']}' not found."
+                    raise RuntimeError(errmsg)
 
                 if not source_event.get("sender"):
-                    raise Exception("Source Event has no sender, skipping...")
+                    raise KnownException("Source Event has no sender.")
 
                 if "aysvc" in source_event["sender"]:
-                    raise Exception("Event is from AYON Service, skipping...")
+                    logging.debug(f"{source_event['sender'] = }")
+                    raise KnownException("Event is from AYON Service.")
 
                 ayon_api.update_event(
                     target_event["id"],
@@ -134,12 +140,19 @@ class HierarchyTemplateProcessor:
                     TaskTemplateHandler.process_event(
                         source_event, self.settings, project
                     )
-            except Exception as err:
+            except (RuntimeError, HierarchyTemplateAttributreNotPresent) as err:
                 log_traceback(err)
                 ayon_api.update_event(
                     target_event["id"],
                     description=f"{err}",
                     status="failed",
+                )
+            except KnownException as err:
+                logging.debug(f"{err}")
+                ayon_api.update_event(
+                    target_event["id"],
+                    description=f"{err}",
+                    status="finished",
                 )
             else:
                 success_msg = "Successfully applied Template"
