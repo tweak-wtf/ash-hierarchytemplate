@@ -48,7 +48,7 @@ def ensure_hierarchy_template_attrib(settings: Dict):
             raise HierarchyTemplateAttributreNotPresent(
                 f"Please add the following templates to 'ashHierarchyTemplate' Attribute: {missing_templates}"
             )
-    else: # create the attribute
+    else:  # create the attribute
         new_attrib_position = len(attributes) + 1
         new_attrib_data = {
             "type": "string",
