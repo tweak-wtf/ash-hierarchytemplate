@@ -94,6 +94,20 @@ class HierarchyTemplateProcessor:
                 sender=get_hostname(),
                 max_retries=1,
                 sequential=False,
+                events_filter={
+                    "operator": "or",
+                    "conditions": [
+                        {   # don't ignore events from API calls
+                            "key": "sender",
+                            "operator": "notnull",
+                        },
+                        {   # don't ignore events from all ASH services
+                            "key": "sender",
+                            "operator": "notin",
+                            "value": "aysvc",
+                        },
+                    ],
+                },
             )
             target_event = project_hierarchy_event or folder_tasks_event
 
