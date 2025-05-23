@@ -17,10 +17,6 @@ class HierarchyTemplateAttributreNotPresent(Exception):
     pass
 
 
-class KnownException(Exception):
-    pass
-
-
 def ensure_hierarchy_template_attrib(settings: Dict):
     """Ensure that the HierarchyTemplate attributes are present in the Ayon DB."""
     resp = ayon_api.get("attributes")
@@ -129,13 +125,6 @@ class HierarchyTemplateProcessor:
                     errmsg = f"Project '{source_event['project']}' not found."
                     raise RuntimeError(errmsg)
 
-                if not source_event.get("sender"):
-                    raise KnownException("Source Event has no sender.")
-
-                if "aysvc" in source_event["sender"]:
-                    logging.debug(f"{source_event['sender'] = }")
-                    raise KnownException("Event is from AYON Service.")
-
                 ayon_api.update_event(
                     target_event["id"],
                     project_name=project["name"],
@@ -160,13 +149,6 @@ class HierarchyTemplateProcessor:
                     target_event["id"],
                     description=f"{err}",
                     status="failed",
-                )
-            except KnownException as err:
-                logging.debug(f"{err}")
-                ayon_api.update_event(
-                    target_event["id"],
-                    description=f"{err}",
-                    status="finished",
                 )
             else:
                 success_msg = "Successfully applied Template"
