@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ash-hierarchytemplate-processor"
-version = "0.2.4-dev"
+version = "0.2.4"
 description = "Hierarchy Templates for AYON projects"
 authors = ["doerp <me@doerp.cool>"]
 package-mode = false
