@@ -1,6 +1,6 @@
 name = "hierarchytemplate"
 title = "HierarchyTemplate"
-version = "0.2.4"
+version = "0.2.5-dev"
 
 services = {
     "HierarchyTemplateProcessor": {"image": f"doerp/ash-hierarchytemplate-processor:{version}"},
