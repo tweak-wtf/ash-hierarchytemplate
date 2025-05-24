@@ -68,6 +68,8 @@ def ensure_hierarchy_template_attrib(settings: Dict):
 class HierarchyTemplateProcessor:
     def __init__(self):
         ayon_api.init_service()
+        self.svc_name = ayon_api.get_service_name()
+        logging.info(f"Started {self.svc_name} service")
 
     def start_processing(self):
         """Main loop querying AYON events for new `entity.project.created` and `entity.folder.created` events"""
@@ -90,17 +92,18 @@ class HierarchyTemplateProcessor:
                 sender=get_hostname(),
                 max_retries=1,
                 sequential=False,
+                ignore_older_than=1,
                 events_filter={
                     "operator": "or",
                     "conditions": [
-                        {   # don't ignore events from API calls
+                        {   # ignore events from API calls
                             "key": "sender",
                             "operator": "notnull",
                         },
-                        {   # don't ignore events from all ASH services
+                        {   # ignore events from own processor service
                             "key": "sender",
-                            "operator": "notin",
-                            "value": "aysvc",
+                            "operator": "excludes",
+                            "value": f"{self.svc_name}",
                         },
                     ],
                 },
