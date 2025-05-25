@@ -94,7 +94,7 @@ class HierarchyTemplateProcessor:
                 sequential=False,
                 ignore_older_than=1,
                 events_filter={
-                    "operator": "or",
+                    "operator": "and",
                     "conditions": [
                         {   # ignore events from API calls
                             "key": "sender",
