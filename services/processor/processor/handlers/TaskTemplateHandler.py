@@ -51,18 +51,25 @@ def process_event(event: dict, settings: dict, project: dict) -> None:
     logging.info(f"{event_folder = }")
     logging.info(f"{dir(event_folder) = }")
 
-    if template_filter_hit := filter(
+    folder_type_filter = filter(
         lambda tmpl: tmpl["folder_type"] == event_folder["folderType"],
         settings["task_template"],
-    ):
-        if path_filter_hit := filter(
-            lambda tmpl: event_folder["path"] in tmpl["folder_paths"]
-            if tmpl["folder_paths"]
-            else True,
-            template_filter_hit,
-        ):
-            task_template = TaskTemplate(
-                template_data=next(path_filter_hit),
-                project=project,
-            )
-            task_template.apply(folder=event_folder)
+    )
+    template_data = next(folder_type_filter, None)
+    if not template_data:
+        logging.info("Skipping because no task template matches folder type")
+        return
+
+    folder_path_found = False
+    for path in event_folder.get("folderPaths", []):
+        if path in template_data["folder_paths"]:
+            folder_path_found = True
+        if not folder_path_found:
+            logging.info("Skipping because event folder path doesn't match path filter")
+            return
+
+    task_template = TaskTemplate(
+        template_data=template_data,
+        project=project,
+    )
+    task_template.apply(folder=event_folder)
