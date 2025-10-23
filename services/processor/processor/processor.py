@@ -74,6 +74,7 @@ class HierarchyTemplateProcessor:
     def start_processing(self):
         """Main loop querying AYON events for new `entity.project.created` and `entity.folder.created` events"""
         self.settings = ayon_api.get_service_addon_settings()
+        logging.info(f"{self.settings = }")
         ensure_hierarchy_template_attrib(self.settings)
 
         while True:
@@ -102,7 +103,7 @@ class HierarchyTemplateProcessor:
                         },
                         {   # ignore events from own processor service
                             "key": "sender",
-                            "operator": "excludes",
+                            "operator": "ne",
                             "value": f"{self.svc_name}",
                         },
                     ],
