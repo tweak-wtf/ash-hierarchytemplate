@@ -43,6 +43,11 @@ def process_event(event: dict, settings: dict, project: dict) -> None:
     event_folder = ayon_api.get_folder_by_id(
         project["name"], event["summary"]["entityId"]
     )
+    if not event_folder:
+        errmsg = f"Folder with ID {event['summary']['entityId']} not found"
+        logging.error(errmsg)
+        raise RuntimeError(errmsg)
+
     logging.info(f"{event_folder = }")
     logging.info(f"{dir(event_folder) = }")
 
