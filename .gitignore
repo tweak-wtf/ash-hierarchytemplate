@@ -1,5 +1,5 @@
 # Addon package directory
-package/*
+/package/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -13,10 +13,11 @@ __pycache__/
 .Python
 build/
 develop-eggs/
-# dist/
+dist/
 downloads/
 eggs/
 .eggs/
+/lib/
 lib64/
 parts/
 sdist/
@@ -159,3 +160,5 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+node_modules
+.vscode/settings.json
