@@ -1,7 +1,7 @@
 {
   "name": "ayon-addon-full-template",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.3.0-dev",
   "type": "module",
   "scripts": {
     "dev": "node ./node_modules/@ynput/ayon-addon-dev/dist/cli.js dev",
