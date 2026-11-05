@@ -5,7 +5,6 @@ version = "0.3.0-dev"
 services = {
     "HierarchyTemplateProcessor": {"image": f"doerp/ash-hierarchytemplate-processor:{version}"},
 }
-client_dir = "ash_hierarchytemplate"
 
 ayon_required_addons = {
     "core": ">=0.3.0",
