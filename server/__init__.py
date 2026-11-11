@@ -6,6 +6,7 @@ from .settings import HierarchyTemplateAddonSettings, DEFAULT_VALUES
 
 class HierarchyTemplateAddon(BaseServerAddon):
     settings_model: type[HierarchyTemplateAddonSettings] = HierarchyTemplateAddonSettings
+    addon_type = "server"
 
     frontend_modules = {"production": ["manifest"]}
 
