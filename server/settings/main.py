@@ -66,86 +66,57 @@ class HierarchyTemplateSettings(BaseSettingsModel):
     )
 
 
-class TaskTemplateSettings(BaseSettingsModel):
-    """Task Template Settings."""
+class AutoApplySettingsModel(BaseSettingsModel):
+    """Auto Apply Settings."""
 
-    name: str = Field("", description="Name of the Task Template Filter.")
-    folder_paths: List[str] = Field(
+    enabled: bool = Field(
+        False,
+        description="Enable auto apply for this task template.",
+        title="Auto Apply",
+    )
+    folder_types: list[str] = Field(
+        default_factory=list,
+        enum_resolver=folder_types_enum,
+        description="List of Folder Types for auto apply.",
+        title="Folder Types",
+    )
+    folder_paths: list[str] = Field(
         default_factory=list,
         description="List of Folder Paths.",
         title="Folder Paths",
     )
-    folder_type: str = Field(
-        default_factory=list,
-        enum_resolver=folder_types_enum,
-        title="Folder Type",
-        scope=["studio"],
-    )
-    tasks: List[Task] = Field(
+
+
+class TaskTemplateSettings(BaseSettingsModel):
+    """Task Template Settings."""
+
+    name: str = Field("", description="Name of the Task Template.")
+    tasks: list[Task] = Field(
         default_factory=list,
         description="List of Tasks.",
         title="Tasks",
     )
-
-    def __init__(self, **data):
-        super().__init__(**data)
-        self.name = self.folder_type.lower()
+    auto_apply: AutoApplySettingsModel = AutoApplySettingsModel(
+        default_factory=AutoApplySettingsModel,
+        title="Auto Apply",
+        description="Auto Apply Settings.",
+    )
 
 
 class HierarchyTemplateAddonSettings(BaseSettingsModel):
     """Hierarchy Template Addon Settings."""
 
-    task_template: List[TaskTemplateSettings] = Field(
+    task_templates: List[TaskTemplateSettings] = Field(
         default_factory=list,
         description="List of Task Templates.",
         title="Task Templates",
     )
-    hierarchy_template: List[HierarchyTemplateSettings] = Field(
+    project_templates: List[HierarchyTemplateSettings] = Field(
         default_factory=list,
         description="List of Project Hierarchy Templates.",
         title="Hierarchy Templates",
     )
 
 
-DEFAULT_VALUES = {
-    "hierarchy_template": [
-        {
-            "name": "default",
-            "hierarchy": [
-                {
-                    "name": "assets",
-                    "type": "Folder",
-                    "tasks": [],
-                    "children": [
-                        {
-                            "name": "testAsset01",
-                            "type": "Asset",
-                            "tasks": [
-                                {"name": "modeling", "type": "Modeling"},
-                                {"name": "texture", "type": "Texture"},
-                                {"name": "rigging", "type": "Rigging"},
-                            ],
-                            "children": [],
-                        }
-                    ],
-                },
-                {
-                    "name": "shots",
-                    "type": "Folder",
-                    "tasks": [{"name": "edit", "type": "Edit"}],
-                    "children": [
-                        {
-                            "name": "testShot01",
-                            "type": "Shot",
-                            "tasks": [
-                                {"name": "compositing", "type": "Compositing"},
-                                {"name": "animation", "type": "Animation"},
-                            ],
-                            "children": [],
-                        }
-                    ],
-                },
-            ],
-        }
-    ]
-}
+# todo: create sane defaults
+DEFAULT_VALUES = {}
