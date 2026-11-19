@@ -8,7 +8,8 @@ class HierarchyTemplateAddon(BaseServerAddon):
     settings_model: type[HierarchyTemplateAddonSettings] = HierarchyTemplateAddonSettings
     addon_type = "server"
 
-    frontend_modules = {"production": ["manifest"]}
+    frontend_modules = {"hierarchytemplates": ["manifest"]}
+
 
     async def get_default_settings(self):
         settings_model_cls = self.get_settings_model()

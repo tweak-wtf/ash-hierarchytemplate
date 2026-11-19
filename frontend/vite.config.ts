@@ -14,5 +14,5 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  plugins: [react(), ayonAddon({ name: "production" })],
+  plugins: [react(), ayonAddon({ name: "hierarchytemplates" })],
 });
