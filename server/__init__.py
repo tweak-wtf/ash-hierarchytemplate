@@ -109,7 +109,7 @@ class HierarchyTemplateAddon(BaseServerAddon):
                     name=task_name,
                     task_type=task_type,
                     as_user=event.user,
-                    # assignees=list(task_assignees),  # todo: add user assignment
+                    assignees=list(task_assignees)
                 )
 
         result = await pops.process(can_fail=True, raise_on_error=False)
