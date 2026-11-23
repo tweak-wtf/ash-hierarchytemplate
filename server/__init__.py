@@ -3,6 +3,7 @@ from ayon_server.logging import log_traceback, logger
 from ayon_server.api.dependencies import CurrentUser
 from ayon_server.types import OPModel
 from ayon_server.operations import ProjectLevelOperations
+from ayon_server.events import EventStream
 
 
 from pydantic import BaseModel
@@ -40,6 +41,8 @@ class HierarchyTemplateAddon(BaseServerAddon):
             method="POST",
             description="Applies a task template to selected folder(s)",
         )
+        EventStream.subscribe("entity.folder.created", self.on_folder_created)
+
 
     async def get_default_settings(self):
         settings_model_cls = self.get_settings_model()
@@ -80,5 +83,38 @@ class HierarchyTemplateAddon(BaseServerAddon):
         result = await pops.process(can_fail=True, raise_on_error=False)
         return result
 
+    async def on_folder_created(self, event):
+        tasks_to_apply = {}
+        task_templates = await self.get_task_templates(event.project)
+        for template in task_templates:
+            if not template.auto_apply:
+                continue
+            #  todo: filter for auto_apply settings
+
+            for task in template.tasks:
+                if not tasks_to_apply.get(task.type):
+                    tasks_to_apply[task.type] = {task.name: set(task.assignees)}
+                    continue
+                if task.name in tasks_to_apply[task.type]:
+                    tasks_to_apply[task.type][task.name].update(task.assignees)
+                else:
+                    tasks_to_apply[task.type][task.name] = set(task.assignees)
+
+        pops = ProjectLevelOperations(event.project)
+        for task_type, task_info in tasks_to_apply.items():
+            for task_name, task_assignees in task_info.items():
+                pops.create(
+                    "task",
+                    folder_id=event.summary["entityId"],
+                    name=task_name,
+                    task_type=task_type,
+                    as_user=event.user,
+                    # assignees=list(task_assignees),  # todo: add user assignment
+                )
+
+        result = await pops.process(can_fail=True, raise_on_error=False)
+        logger.info(f"Task application result: {result}")
+
+        return result
 
 
