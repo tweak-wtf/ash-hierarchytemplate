@@ -1,13 +1,21 @@
-import { defineAddon, entityMenuItem } from "@ynput/ayon-addon/manifest";
+import { defineAddon, entityMenuItem, slicerMenuItem } from "@ynput/ayon-addon/manifest";
 
 export default defineAddon({
   contributes: [
     entityMenuItem({
-      id: "noop_folder_menu",
-      label: "Do nothing",
-      icon: "event",   // where are those icons defined?
+      id: "apply_task_template_popup",
+      label: "Task Templates",
+      icon: "account_tree",
       entityTypes: ["folder"],
-      run: () => import("./menu/noop"),
+      run: () => import("./menu/applyTaskTemplatePopup"),
+    }),
+    slicerMenuItem({
+      id: "apply_task_template_popup",
+      label: "Task Templates",
+      icon: "account_tree",
+      sliceTypes: ["hierarchy"],
+      in: ["context", "dropdown"],
+      run: () => import("./menu/applyTaskTemplatePopup"),
     }),
   ],
 });
